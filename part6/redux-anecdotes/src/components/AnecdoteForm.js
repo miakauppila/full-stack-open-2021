@@ -2,17 +2,21 @@ import React from 'react'
 import { useDispatch } from 'react-redux'
 import { createNewAction } from '../reducers/anecdoteReducer'
 import { showNotificationAction, closeNotificationAction } from '../reducers/notificationReducer'
+import axiosService from '../services/anecdotes'
 
 const AnecdoteForm = (props) => {
     // use this hook like store.dispatch
     const dispatch = useDispatch()
 
-    const createNew = (event) => {
+    const createNew = async (event) => {
         event.preventDefault()
         console.log('createNew', event.target.newInput.value)
         const input = event.target.newInput.value
         event.target.newInput.value = ''
-        dispatch(createNewAction(input))
+
+        const newAnecdote = await axiosService.createNew(input)
+        console.log(newAnecdote)
+        dispatch(createNewAction(newAnecdote)) // object from backend
         dispatch(showNotificationAction(`You created a new anecdote "${input}"`))
         setTimeout(() => {
             dispatch(closeNotificationAction())
