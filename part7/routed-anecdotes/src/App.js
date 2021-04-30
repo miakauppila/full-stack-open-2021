@@ -4,6 +4,7 @@ import {
   useHistory,
   useRouteMatch
 } from "react-router-dom"
+import { useField } from './hooks'
 
 const Menu = () => {
   const padding = {
@@ -64,21 +65,28 @@ const Footer = () => (
 )
 
 const CreateNew = (props) => {
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
+  // custom-hook for the form
+  const content = useField('text')
+  const author = useField('text')
+  const info = useField('text')
 
   const history = useHistory()
 
   const handleSubmit = (e) => {
     e.preventDefault()
     props.addNew({
-      content,
-      author,
-      info,
+      content: content.value,
+      author: author.value,
+      info: info.value,
       votes: 0
     })
     history.push('/')
+  }
+
+  const handleReset = () => {
+    content.onReset()
+    author.onReset()
+    info.onReset()
   }
 
   return (
@@ -87,17 +95,18 @@ const CreateNew = (props) => {
       <form onSubmit={handleSubmit}>
         <div>
           content
-          <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
+          <input {...content}/>
         </div>
         <div>
           author
-          <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
+          <input {...author}/>
         </div>
         <div>
           url for more info
-          <input name='info' value={info} onChange={(e) => setInfo(e.target.value)} />
+          <input {...info}/>
         </div>
-        <button>create</button>
+        <button type='submit'>create</button>
+        <button type='reset' onClick={handleReset} >reset</button>
       </form>
     </div>
   )
@@ -111,15 +120,15 @@ const Notification = ({ message }) => {
     padding: 10,
     borderWidth: 1
   }
-    if (message === null) {
-      return null
-    }
-    return (
-      <div style={style}>
-        {message}
-      </div>
-    )
+  if (message === null) {
+    return null
   }
+  return (
+    <div style={style}>
+      {message}
+    </div>
+  )
+}
 
 
 const App = () => {
@@ -168,7 +177,7 @@ const App = () => {
   const match = useRouteMatch('/anecdotes/:id')
   // when match is not null, find the correct anecdote
   const anecdote = match ? anecdotes.find(anecdote => anecdote.id === match.params.id)
-  : null
+    : null
 
   return (
     <div>
