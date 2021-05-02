@@ -21,24 +21,26 @@ const useCountry = (name) => {
   //get data from rest API with axios
   //useEffect runs when name changes
   useEffect(() => {
-    console.log("useEffect");
-    axios
-      .get(`https://restcountries.eu/rest/v2/name/${name}?fullText=true`)
-      .then((response) => {
-        console.log('response', response)
-        setCountry({
-          found: true,
-          data: {
-            capital: response.data[0].capital,
-            population: response.data[0].population,
-            flag: response.data[0].flag
-          }
+    console.log('useEffect')
+    if (name !== '') {
+      axios
+        .get(`https://restcountries.eu/rest/v2/name/${name}?fullText=true`)
+        .then((response) => {
+          console.log('response', response)
+          setCountry({
+            found: true,
+            data: {
+              capital: response.data[0].capital,
+              population: response.data[0].population,
+              flag: response.data[0].flag
+            }
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+          setCountry({ found: false })
         });
-      })
-      .catch((error) => {
-        console.log(error);
-        setCountry({found: false})
-      });
+    }
   }, [name]);
 
   return country
