@@ -1,26 +1,17 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
+import { connect } from 'react-redux'
 import { createNewAction } from '../reducers/anecdoteReducer'
-import { showNotificationAction, closeNotificationAction } from '../reducers/notificationReducer'
-import axiosService from '../services/anecdotes'
+import { setNotificationAction } from '../reducers/notificationReducer'
 
 const AnecdoteForm = (props) => {
-    // use this hook like store.dispatch
-    const dispatch = useDispatch()
 
     const createNew = async (event) => {
         event.preventDefault()
         console.log('createNew', event.target.newInput.value)
         const input = event.target.newInput.value
         event.target.newInput.value = ''
-
-        const newAnecdote = await axiosService.createNew(input)
-        console.log(newAnecdote)
-        dispatch(createNewAction(newAnecdote)) // object from backend
-        dispatch(showNotificationAction(`You created a new anecdote "${input}"`))
-        setTimeout(() => {
-            dispatch(closeNotificationAction())
-          }, 5000)
+        props.createNewAction(input)
+        props.setNotificationAction(`You created '${input}'`, 5)
     }
 
     return (
@@ -35,4 +26,11 @@ const AnecdoteForm = (props) => {
 
 }
 
-export default AnecdoteForm
+const mapDispatchToProps = {
+    createNewAction,
+    setNotificationAction
+  }
+
+// use connect to access action creators+dispatch via props
+const ConnectedAnecdoteForm = connect(null, mapDispatchToProps )(AnecdoteForm)
+export default ConnectedAnecdoteForm

@@ -1,13 +1,14 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { voteAction } from '../reducers/anecdoteReducer'
-import { showNotificationAction, closeNotificationAction } from '../reducers/notificationReducer'
+import { setNotificationAction } from '../reducers/notificationReducer'
 
 const AnecdoteList = (props) => {
     // this hook retrieves data from redux store
     const anecdotes = useSelector(state => state.anecdotes)
     const filter = useSelector(state => state.filter)
 
+    // use this hook like store.dispatch
     const dispatch = useDispatch()
 
     const findMatches = (wordToSearch, anecdotes) => {
@@ -27,11 +28,8 @@ const AnecdoteList = (props) => {
 
     const vote = (anecdote) => {
         console.log('vote', anecdote.id)
-        dispatch(voteAction(anecdote.id))
-        dispatch(showNotificationAction(`You voted "${anecdote.content}"`))
-        setTimeout(() => {
-            dispatch(closeNotificationAction())
-          }, 5000)
+        dispatch(voteAction(anecdote))
+        dispatch(setNotificationAction(`You voted '${anecdote.content}'`, 5))
     }
 
     return (

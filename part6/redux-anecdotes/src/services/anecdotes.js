@@ -8,12 +8,20 @@ const getAll = async () => {
 }
 
 const createNew = async (content) => {
-  const object = { content, votes: 0 }
-  const response = await axios.post(baseUrl, object)
-  return response.data // backend adds id to the returned obj
+  const anecdoteObject = { content, votes: 0 }
+  const response = await axios.post(baseUrl, anecdoteObject)
+  return response.data // backend adds id to the returned object
 }
 
-export default { 
+// patch includes only the changed value ie. votes
+const updateVotes = async (anecdote) => {
+  const object = { votes: anecdote.votes + 1 }
+  const response = await axios.patch(`${baseUrl}/${anecdote.id}`, object)
+  return response.data
+}
+
+export default {
   getAll,
-createNew
- }
+  createNew,
+  updateVotes
+}

@@ -1,22 +1,20 @@
 import React, { useRef } from 'react'
-import { useDispatch } from 'react-redux'
+import { connect } from 'react-redux'
 import { setFilterAction, clearFilterAction } from '../reducers/filterReducer'
 
-const Filter = () => {
-
-    const dispatch = useDispatch()
+const Filter = (props) => {
 
     // must be declared first so the ref in the input can refer to it
     const filterInput = useRef(null);
 
     const handleChange = (event) => {
         const input = event.target.value
-        dispatch(setFilterAction(input))
+        props.setFilterAction(input)
     }
 
     const handleClear = (event) => {
-        dispatch(clearFilterAction())
-        // clear the field with the ref
+        props.clearFilterAction()
+        // clear the field connected to the ref
         filterInput.current.value = ""
     }
 
@@ -30,4 +28,11 @@ const Filter = () => {
     )
 }
 
-export default Filter
+const mapDispatchToProps = {
+    setFilterAction,
+    clearFilterAction
+  }
+
+// use connect to access action creators+dispatch via props
+const ConnectedFilter = connect(null, mapDispatchToProps )(Filter)
+export default ConnectedFilter
