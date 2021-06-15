@@ -10,7 +10,10 @@ const NewBook = (props) => {
   const [genres, setGenres] = useState([])
 
   const [ createBook ] = useMutation(CREATE_BOOK, {
-    refetchQueries: [ { query: ALL_BOOKS }, { query: ALL_AUTHORS } ]
+    refetchQueries: [ { query: ALL_BOOKS }, { query: ALL_AUTHORS } ],
+    onError: (error) => {
+      props.setError(error.graphQLErrors[0].message)
+    },
   })
 
   if (!props.show) {
@@ -20,8 +23,6 @@ const NewBook = (props) => {
   const submit = async (event) => {
     event.preventDefault()
     const published=Number(publishedYear)
-    console.log('add book...')
-    console.log(published)
     createBook({  variables: { title, author, published, genres } })
 
     setTitle('')
@@ -29,6 +30,7 @@ const NewBook = (props) => {
     setAuthor('')
     setGenres([])
     setGenre('')
+    props.setPage('books')
   }
 
   const addGenre = () => {
@@ -38,6 +40,7 @@ const NewBook = (props) => {
 
   return (
     <div>
+      <h2>add new book</h2>
       <form onSubmit={submit}>
         <div>
           title

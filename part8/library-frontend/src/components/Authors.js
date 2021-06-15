@@ -7,15 +7,22 @@ const Authors = (props) => {
   const [selectedName, setSelectedName] = useState(null);
   const [bornYear, setBornYear] = useState('')
   
-
   const result = useQuery(ALL_AUTHORS)
 
   const [updateAuthor] = useMutation(UPDATE_AUTHOR, {
-    refetchQueries: [{ query: ALL_AUTHORS }]
+    // mutation returns id and Author on the list is updated without refetch
+    onError: (error) => {
+      props.setError(error.graphQLErrors[0].message)
+    }
   })
 
   const handleSubmit = async (event) => {
     event.preventDefault()
+    // if no author is selected in the drop-down
+    if(!selectedName) {
+      props.setError('choose an author first')
+      return
+    }
     const setBornTo = Number(bornYear)
     const name=selectedName.value
     updateAuthor({ variables: { name, setBornTo } })
@@ -68,7 +75,7 @@ const Authors = (props) => {
       <form onSubmit={handleSubmit}>
         <p>
         <Select
-          defaultValue={selectedName}
+          value={selectedName}
           onChange={setSelectedName}
           options={authorsOptions}
         />
@@ -78,6 +85,7 @@ const Authors = (props) => {
           <input
             value={bornYear}
             onChange={({ target }) => setBornYear(target.value)}
+            required
           />
         </div>
         <button type='submit'>update author</button>

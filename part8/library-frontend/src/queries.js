@@ -14,9 +14,18 @@ export const ALL_BOOKS = gql`
   query {
     allBooks  {
       title
-      author
+      author { name }
       id
       published
+      genres
+    }
+  }
+`
+
+export const LOGIN = gql`
+  mutation login($username: String!, $password: String!) {
+    login(username: $username, password: $password)  {
+      value
     }
   }
 `
@@ -30,7 +39,7 @@ export const CREATE_BOOK = gql`
       genres: $genres
     ) {
       title
-      author
+      author { name }
       id
       published
       genres
@@ -45,6 +54,7 @@ export const UPDATE_AUTHOR = gql`
     ) {
       name
       born
+      id
     }
   }
 `
