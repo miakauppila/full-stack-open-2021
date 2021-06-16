@@ -12,8 +12,12 @@ const NewBook = (props) => {
   const [ createBook ] = useMutation(CREATE_BOOK, {
     refetchQueries: [ { query: ALL_BOOKS }, { query: ALL_AUTHORS } ],
     onError: (error) => {
+      console.log(error.message)
       props.setError(error.graphQLErrors[0].message)
     },
+    onCompleted: () => {
+      props.setPage('books')
+    }
   })
 
   if (!props.show) {
@@ -30,7 +34,6 @@ const NewBook = (props) => {
     setAuthor('')
     setGenres([])
     setGenre('')
-    props.setPage('books')
   }
 
   const addGenre = () => {
@@ -45,6 +48,7 @@ const NewBook = (props) => {
         <div>
           title
           <input
+            required
             value={title}
             onChange={({ target }) => setTitle(target.value)}
           />
@@ -52,6 +56,7 @@ const NewBook = (props) => {
         <div>
           author
           <input
+            required
             value={author}
             onChange={({ target }) => setAuthor(target.value)}
           />
@@ -59,6 +64,8 @@ const NewBook = (props) => {
         <div>
           published
           <input
+            required
+            type="number"
             value={publishedYear}
             onChange={({ target }) => setPublishedYear(target.value)}
           />

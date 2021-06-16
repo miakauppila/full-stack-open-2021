@@ -1,26 +1,32 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useQuery, useMutation } from '@apollo/client'
 import { ALL_AUTHORS, UPDATE_AUTHOR } from '../queries'
 import Select from 'react-select';
 
-const Authors = (props) => {
+const Authors = ( { show, setError }) => {
   const [selectedName, setSelectedName] = useState(null);
   const [bornYear, setBornYear] = useState('')
   
   const result = useQuery(ALL_AUTHORS)
 
-  const [updateAuthor] = useMutation(UPDATE_AUTHOR, {
+  const [updateAuthor, updateResult] = useMutation(UPDATE_AUTHOR, {
     // mutation returns id and Author on the list is updated without refetch
     onError: (error) => {
-      props.setError(error.graphQLErrors[0].message)
+      setError(error.graphQLErrors[0].message)
     }
   })
+
+  useEffect(() => {
+    if (updateResult.data && updateResult.data.editNumber === null) {
+      setError('author not found')
+    }
+  }, [result.data]) // eslint-disable-line
 
   const handleSubmit = async (event) => {
     event.preventDefault()
     // if no author is selected in the drop-down
     if(!selectedName) {
-      props.setError('choose an author first')
+      setError('choose an author first')
       return
     }
     const setBornTo = Number(bornYear)
@@ -31,7 +37,7 @@ const Authors = (props) => {
     setBornYear('')
   }
 
-  if (!props.show) {
+  if (!show) {
     return null
   }
 
@@ -73,13 +79,11 @@ const Authors = (props) => {
 
       <h2>Set birthyear</h2>
       <form onSubmit={handleSubmit}>
-        <p>
         <Select
           value={selectedName}
           onChange={setSelectedName}
           options={authorsOptions}
         />
-        </p>
         <div>
           born
           <input

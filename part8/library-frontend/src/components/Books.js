@@ -49,7 +49,7 @@ const Books = (props) => {
             </th>
           </tr>
           {books.map(book =>
-            <tr key={book.title}>
+            <tr key={book.id}>
               <td>{book.title}</td>
               <td>{book.author.name}</td>
               <td>{book.published}</td>
@@ -58,7 +58,7 @@ const Books = (props) => {
         </tbody>
       </table>
       {uniqueGenres.map(genre => 
-      <button onClick={() => setFilterGenre(genre)}>{genre}</button>
+      <button key={genre} onClick={() => setFilterGenre(genre)}>{genre}</button>
         )}
       <button onClick={() => setFilterGenre('all genres')}>all genres</button>
     </div>
