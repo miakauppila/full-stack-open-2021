@@ -5,6 +5,8 @@ const Book = require('./models/bookSchema')
 const User = require('./models/userSchema')
 const config = require('./utils/config')
 const jwt = require('jsonwebtoken')
+const { PubSub } = require('apollo-server')
+const pubsub = new PubSub()
 
 const MONGODB_URI = config.MONGODB_URI
 const JWT_SECRET = config.SECRET
@@ -19,6 +21,7 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true,
     console.log('error connection to MongoDB:', error.message)
   })
 
+  // Graph QL schema
 const typeDefs = gql`
   type Author {
     name: String!
@@ -73,6 +76,10 @@ const typeDefs = gql`
       password: String!
     ): Token
   }
+
+  type Subscription {
+    bookAdded: Book!
+  }    
 `
 
 const resolvers = {
@@ -116,15 +123,17 @@ const resolvers = {
       if (!existingAuthor) {
         const newAuthor = new Author({ name: args.author, born: null })
         const newBook = new Book({ ...args, author: newAuthor })
+        console.log(newBook)
         try {
-          await newAuthor.save()
           await newBook.save()
+          await newAuthor.save()
         }
         catch (error) {
           throw new UserInputError(error.message, {
             invalidArgs: args,
           })
         }
+        pubsub.publish('BOOK_ADDED', { bookAdded: newBook })
         return newBook
       }
       else {
@@ -184,7 +193,12 @@ const resolvers = {
 
       return { value: jwt.sign(userForToken, JWT_SECRET) }
     }
-  }
+  },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator(['BOOK_ADDED'])
+    },
+  },
 }
 
 const server = new ApolloServer({
@@ -204,6 +218,7 @@ const server = new ApolloServer({
   }
 })
 
-server.listen().then(({ url }) => {
+server.listen().then(({ url, subscriptionsUrl }) => {
   console.log(`Server ready at ${url}`)
+  console.log(`Subscriptions ready at ${subscriptionsUrl}`)
 })
