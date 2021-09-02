@@ -9,12 +9,12 @@ const calculateBmi = (bodyHeight: number, bodyMass: number): string => {
     return 'Overweight (Pre-obese)';
   }
   else {
-    return 'Obese'
+    return 'Obese';
   }
-}
+};
 
-console.log(calculateBmi(180, 74))
+console.log(calculateBmi(180, 74));
 
-export default calculateBmi
+export default calculateBmi;
 
 

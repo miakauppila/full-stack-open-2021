@@ -10,7 +10,7 @@ const parseArguments = (args: Array<string>): ExerciseInput => {
         throw new Error('Provided target value was not a number.');
     }
 
-    let valuesArray = [];
+    const valuesArray = [];
     for (let i = 3; i < args.length; i++) {
         if (!isNaN(Number(args[i]))) {
             valuesArray.push(Number(args[i]));
@@ -20,7 +20,7 @@ const parseArguments = (args: Array<string>): ExerciseInput => {
     }
 
     return { targetValue: Number(args[2]), dailyValues: valuesArray };
-}
+};
 
 interface ExerciseResults {
     periodLength: number;
@@ -34,9 +34,7 @@ interface ExerciseResults {
 
 const calculateExercises = (target: number, dailyValues: number[]): ExerciseResults => {
     let countDays = 0;
-    let sum = 0;
     for (let i = 0; i < dailyValues.length; i++) {
-        sum = +dailyValues[i];
         if (dailyValues[i] > 0) {
             countDays++;
         }
@@ -48,11 +46,11 @@ const calculateExercises = (target: number, dailyValues: number[]): ExerciseResu
     let ratingString = '';
     if (average >= target) {
         rating = 3;
-        ratingString = 'Perfect, you reached the target!'
+        ratingString = 'Perfect, you reached the target!';
     }
     else if (average > 0.8 * target) {
         rating = 2;
-        ratingString = 'Not too bad (over 80% of target) but you could still do better.'
+        ratingString = 'Not too bad (over 80% of target) but you could still do better.';
     }
     else {
         rating = 1;
@@ -67,14 +65,15 @@ const calculateExercises = (target: number, dailyValues: number[]): ExerciseResu
         success: average >= target ? true : false,
         rating: rating,
         ratingDescription: ratingString
-    }
+    };
 
-}
+};
 
 try {
     const { targetValue, dailyValues } = parseArguments(process.argv);
     console.log(calculateExercises(targetValue, dailyValues));
-} catch (e) {
+} catch (e: unknown) {
+    if (e instanceof Error) 
     console.log('Error encountered, message: ', e.message);
 }
 
