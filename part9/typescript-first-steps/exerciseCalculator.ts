@@ -32,7 +32,7 @@ interface ExerciseResults {
     ratingDescription: string;
 }
 
-const calculateExercises = (target: number, dailyValues: number[]): ExerciseResults => {
+export const calculateExercises = (target: number, dailyValues: number[]): ExerciseResults => {
     let countDays = 0;
     for (let i = 0; i < dailyValues.length; i++) {
         if (dailyValues[i] > 0) {
@@ -69,15 +69,16 @@ const calculateExercises = (target: number, dailyValues: number[]): ExerciseResu
 
 };
 
-try {
-    const { targetValue, dailyValues } = parseArguments(process.argv);
-    console.log(calculateExercises(targetValue, dailyValues));
-} catch (e: unknown) {
-    if (e instanceof Error) 
-    console.log('Error encountered, message: ', e.message);
-}
-
-// Run the program with command:
+// Run the program from command line:
 // npm run calculateExercises target [dailyValues]
 // target => must be a number eg. 2
 // [dailyValues] => must be a sequence of numbers eg. 2 2 1 0 1 0 1
+if (require.main === module) {
+    try {
+        const { targetValue, dailyValues } = parseArguments(process.argv);
+        console.log(calculateExercises(targetValue, dailyValues));
+    } catch (e: unknown) {
+        if (e instanceof Error)
+            console.log('Error encountered, message: ', e.message);
+    }
+}

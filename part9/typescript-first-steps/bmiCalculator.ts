@@ -13,7 +13,7 @@ const calculateBmi = (bodyHeight: number, bodyMass: number): string => {
   }
 };
 
-console.log(calculateBmi(180, 74));
+//console.log(calculateBmi(180, 74));
 
 export default calculateBmi;
 
