@@ -1,10 +1,10 @@
 import express from 'express';
-import diagnosesService from '../services/diagnosesService';
+import diagnosisService from '../services/diagnosisService';
 
 const router = express.Router();
 
 router.get('/', (_req, res) => {
-  res.send(diagnosesService.getEntries());
+  res.send(diagnosisService.getEntries());
 });
 
 router.post('/', (_req, res) => {
