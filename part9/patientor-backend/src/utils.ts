@@ -1,4 +1,4 @@
-import { Gender, NewPatient } from './types';
+import { Gender, NewPatient, Entry, EntryType } from './types';
 
 const isString = (text: unknown): text is string => {
     return typeof text === 'string' || text instanceof String;
@@ -50,6 +50,32 @@ const parseOccupation = (value: unknown): string => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+const isEnumType = (param: any): param is EntryType => {
+    return Object.values(EntryType).includes(param);
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const isCorrectTypeString = (entry: any): void => {
+    if (!entry.type || !isString(entry.type)) {
+        throw new Error('Incorrect or missing type');
+    }
+    if(!isEnumType(entry.type)) {
+        throw new Error('Incorrect type: ' + entry.type);
+    }
+};
+
+const parseEntries = (entries: unknown): Entry[] => {
+    if (!entries || !Array.isArray(entries)) {
+        throw new Error('Incorrect or missing entries: ' + entries);
+    }
+    entries.map((entry: unknown) => {
+        isCorrectTypeString(entry);
+    });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return entries;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const toNewPatientEntry = (object: any): NewPatient => {
     const newEntry: NewPatient = {
         name: parseName(object.name),
@@ -57,7 +83,7 @@ const toNewPatientEntry = (object: any): NewPatient => {
         dateOfBirth: parseDate(object.dateOfBirth),
         gender: parseGender(object.gender),
         occupation: parseOccupation(object.occupation),
-        entries: []
+        entries: parseEntries(object.entries)
     };
     return newEntry;
 };
