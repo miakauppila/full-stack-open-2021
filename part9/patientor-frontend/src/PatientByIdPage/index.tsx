@@ -6,13 +6,14 @@ import { Container, Icon } from "semantic-ui-react";
 import { Patient } from "../types";
 import { apiBaseUrl } from "../constants";
 import { useStateValue } from "../state";
+import Entries from "./Entries";
 
 const PatientByIdPage = () => {
     const [{ patientsFullData }, dispatch] = useStateValue();
     const [error, setError] = React.useState<string | undefined>();
 
     const { id } = useParams<{ id: string }>();
-    const foundPatient = patientsFullData[id];
+    const foundPatient: Patient = patientsFullData[id];
     console.log('foundPatient:', foundPatient);
 
     //only fetch data if patientFullData not found
@@ -68,14 +69,15 @@ const PatientByIdPage = () => {
     return (
         <div className="App">
             <Container>
-                <h3>{foundPatient.name}
-                    <Icon name={getGenderIcon(foundPatient.gender)} size='large' /></h3>
+                <h2>{foundPatient.name}
+                    <Icon name={getGenderIcon(foundPatient.gender)} size='large' /></h2>
                 <div>
                     <b>SSN:</b> {foundPatient.ssn}
                 </div>
                 <div>
                     <b>Occupation:</b> {foundPatient.occupation}
                 </div>
+                <Entries patient={foundPatient} />
             </Container>
         </div>
     );
