@@ -1,5 +1,6 @@
 import React from "react";
 import { Entry, Patient } from "../types";
+import { useStateValue } from "../state";
 
 interface EntryProps {
     patient: Patient
@@ -7,6 +8,7 @@ interface EntryProps {
 
 const Entries = ({ patient }: EntryProps) => {
 
+    const [{ diagnoses },] = useStateValue();
     const entries = patient.entries;
 
     if (!entries.length) {
@@ -27,7 +29,7 @@ const Entries = ({ patient }: EntryProps) => {
             {entries.map((entry: Entry) =>
                 entry.diagnosisCodes ? (
                     entry.diagnosisCodes.map((code: string) =>
-                        <li key={code}>{code}</li>)
+                        <li key={code}>{code} {diagnoses[code].name}</li>)
                 ) : null
             )}
         </>

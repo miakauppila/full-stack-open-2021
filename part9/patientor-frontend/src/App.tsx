@@ -4,8 +4,8 @@ import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
 import { Button, Divider, Header, Container } from "semantic-ui-react";
 
 import { apiBaseUrl } from "./constants";
-import { setPatientListAction, useStateValue } from "./state";
-import { Patient } from "./types";
+import { setDiagnosesAction, setPatientListAction, useStateValue } from "./state";
+import { Patient, Diagnosis } from "./types";
 
 import PatientListPage from "./PatientListPage";
 import PatientByIdPage from "./PatientByIdPage";
@@ -22,11 +22,29 @@ const App = () => {
         );
         //dispatch({ type: "SET_PATIENT_LIST", payload: patientListFromApi });
         dispatch(setPatientListAction(patientListFromApi));
-      } catch (e) {
-        console.error(e);
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          console.error(e.message || 'Unknown Error');
+        }
       }
     };
+
+    const fetchDiagnosesList = async () => {
+      try {
+        const { data: diagnosesData } = await axios.get<Diagnosis[]>(
+          `${apiBaseUrl}/diagnoses`
+        );
+        //dispatch({ type: "SET_DIAGNOSES_LIST", payload: diagnosesData });
+        dispatch(setDiagnosesAction(diagnosesData));
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          console.error(e.message || 'Unknown Error');
+        }
+      }
+    };
+
     void fetchPatientList();
+    void fetchDiagnosesList();
   }, [dispatch]);
 
   return (

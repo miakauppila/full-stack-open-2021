@@ -5,7 +5,7 @@ import { Container, Icon } from "semantic-ui-react";
 
 import { Patient } from "../types";
 import { apiBaseUrl } from "../constants";
-import { useStateValue } from "../state";
+import { setPatientFullDataAction, useStateValue } from "../state";
 import Entries from "./Entries";
 
 const PatientByIdPage = () => {
@@ -20,12 +20,13 @@ const PatientByIdPage = () => {
     React.useEffect(() => {
         if (foundPatient) return;
         const fetchPatientById = async (id: string) => {
-            console.log('do fetch');
+            console.log('fetch patientFullData');
             try {
                 const { data: patientData } = await axios.get<Patient>(
                     `${apiBaseUrl}/patients/${id}`
                 );
-                dispatch({ type: "SET_PATIENT_FULL_DATA", payload: patientData });
+                //dispatch({ type: "SET_PATIENT_FULL_DATA", payload: patientData });
+                dispatch(setPatientFullDataAction(patientData));
             } catch (e: unknown) {
                 if (e instanceof Error) {
                     console.error(e.message || 'Unknown Error');
