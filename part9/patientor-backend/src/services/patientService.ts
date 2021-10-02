@@ -1,6 +1,6 @@
 import patientsData from '../../data/patients';
-import { Patient, NonSensitivePatientData, NewPatient } from '../types';
-import {v4 as uuidv4} from 'uuid';
+import { Patient, NonSensitivePatientData, PatientWithoutId, EntryWithoutId } from '../types';
+import { v4 as uuidv4 } from 'uuid';
 
 const patients: Array<Patient> = patientsData;
 
@@ -18,11 +18,11 @@ const getNonSensitiveEntries = (): NonSensitivePatientData[] => {
   }));
 };
 
-const getPatientById = (id : string): Patient | undefined => {
+const getPatientById = (id: string): Patient | undefined => {
   return patients.find((patient) => patient.id === id);
 };
 
-const addPatient = ( entryObj: NewPatient ): Patient => {
+const addPatient = (entryObj: PatientWithoutId): Patient => {
   const newPatientEntry = {
     id: uuidv4(),
     ...entryObj
@@ -33,9 +33,25 @@ const addPatient = ( entryObj: NewPatient ): Patient => {
   return newPatientEntry;
 };
 
+const addEntry = (entryObj: EntryWithoutId, patientId: string): Patient => {
+  const newEntry = {
+    id: uuidv4(),
+    ...entryObj
+  };
+
+  const foundPatient = patients.find(patient => patient.id === patientId);
+  if(!foundPatient) {
+    throw new Error('Patient with given Id not found');
+  }
+  foundPatient?.entries.push(newEntry);
+  console.log('entryService ready', foundPatient);
+  return foundPatient;
+};
+
 export default {
   getEntries,
   getNonSensitiveEntries,
   getPatientById,
-  addPatient
+  addPatient,
+  addEntry
 };

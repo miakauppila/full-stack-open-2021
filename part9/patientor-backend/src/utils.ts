@@ -1,19 +1,12 @@
-import { Gender, NewPatient, Entry, EntryType } from './types';
+import { Gender, PatientWithoutId, EntryType, EntryWithoutId, HealthCheckRating } from './types';
 
 const isString = (text: unknown): text is string => {
     return typeof text === 'string' || text instanceof String;
 };
 
-const parseName = (value: unknown): string => {
+const parseStringValue = (value: unknown, field: string): string => {
     if (!value || !isString(value)) {
-        throw new Error('Incorrect or missing name');
-    }
-    return value;
-};
-
-const parseSsn = (value: unknown): string => {
-    if (!value || !isString(value)) {
-        throw new Error('Incorrect or missing social security number');
+        throw new Error(`Incorrect or missing ${field}`);
     }
     return value;
 };
@@ -41,51 +34,104 @@ const parseGender = (gender: unknown): Gender => {
     return gender;
 };
 
-const parseOccupation = (value: unknown): string => {
-    if (!value || !isString(value)) {
-        throw new Error('Incorrect or missing occupation');
-    }
-
-    return value;
-};
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isEnumType = (param: any): param is EntryType => {
     return Object.values(EntryType).includes(param);
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const isCorrectTypeString = (entry: any): void => {
-    if (!entry.type || !isString(entry.type)) {
+
+const isCorrectType = (type: unknown): EntryType => {
+    if (!type || !isString(type)) {
         throw new Error('Incorrect or missing type');
     }
-    if(!isEnumType(entry.type)) {
-        throw new Error('Incorrect type: ' + entry.type);
+    if (!isEnumType(type)) {
+        throw new Error('Incorrect type: ' + type);
     }
+    return type;
 };
 
-const parseEntries = (entries: unknown): Entry[] => {
-    if (!entries || !Array.isArray(entries)) {
-        throw new Error('Incorrect or missing entries: ' + entries);
+// const parseEntries = (entries: unknown): Entry[] => {
+//     if (!entries || !Array.isArray(entries)) {
+//         throw new Error('Incorrect or missing entries: ' + entries);
+//     }
+//     entries.map((entry) => {
+//         isCorrectType(entry.type);
+//     });
+//     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+//     return entries;
+// };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const isHealthCheckRating = (param: any): param is HealthCheckRating => {
+    return Object.values(HealthCheckRating).includes(param);
+};
+
+const parsehealthCheckRating = (rating: unknown): HealthCheckRating => {
+    if (!rating || !isHealthCheckRating(rating)) {
+        throw new Error('Incorrect or missing health check rating: ' + rating);
     }
-    entries.map((entry: unknown) => {
-        isCorrectTypeString(entry);
-    });
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return entries;
+    return rating;
+};
+
+const parseDiagnosisCodes = (codes: unknown): string[] => {
+        if (!Array.isArray(codes)) {
+            throw new Error('Incorrect diagnosis codes: ' + codes);
+        }
+        const checked = codes.map((code) =>
+            parseStringValue(code, 'diagnosis code')
+        );
+        return checked;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const toNewPatientEntry = (object: any): NewPatient => {
-    const newEntry: NewPatient = {
-        name: parseName(object.name),
-        ssn: parseSsn(object.ssn),
+export const toNewPatientEntry = (object: any): PatientWithoutId => {
+    const newPatient = {
+        name: parseStringValue(object.name, 'name'),
+        ssn: parseStringValue(object.ssn, 'social security number'),
         dateOfBirth: parseDate(object.dateOfBirth),
         gender: parseGender(object.gender),
-        occupation: parseOccupation(object.occupation),
-        entries: parseEntries(object.entries)
+        occupation: parseStringValue(object.occupation, 'occupation'),
+        entries: []
     };
-    return newEntry;
+    return newPatient;
 };
 
-export default toNewPatientEntry;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const toNewEntry = (object: any): EntryWithoutId => {
+
+    const isBaseEntry = {
+        description: parseStringValue(object.description, 'description'),
+        date: parseDate(object.date),
+        specialist: parseStringValue(object.specialist, 'specialist'),
+        type: isCorrectType(object.type),
+        diagnosisCodes: object.diagnosisCodes? parseDiagnosisCodes(object.diagnosisCodes) : undefined
+    };
+
+    switch (object.type) {
+        case 'Hospital':
+            let entry: EntryWithoutId = {
+                ...isBaseEntry,
+                type: EntryType.Hospital,
+            };
+            return entry;
+        case 'OccupationalHealthcare':
+            entry = {
+                ...isBaseEntry,
+                type: EntryType.OccupationalHealthcare,
+                employerName: parseStringValue(object.employerName, ' employer name')
+            };
+            return entry;
+        case 'HealthCheck':
+            entry = {
+                ...isBaseEntry,
+                type: EntryType.HealthCheck,
+                healthCheckRating: parsehealthCheckRating(object.healthCheckRating)
+            };
+            return entry;
+        default:
+            throw new Error(
+                `Unhandled type: ${JSON.stringify(object.type)}`
+            );
+    }
+
+};
