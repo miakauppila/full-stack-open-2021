@@ -4,6 +4,7 @@ Content-Type: application/json
 { 
 "description": "Medical examination",
 "date": "2021-10-02",
-"type": "Hospital",
-"specialist": "Doctor Doctor"
+"type": "HealthCheck",
+"specialist": "Doctor Doctor",
+"healthCheckRating": 3
 }

@@ -107,9 +107,10 @@ export const toNewEntry = (object: any): EntryWithoutId => {
         diagnosisCodes: object.diagnosisCodes? parseDiagnosisCodes(object.diagnosisCodes) : undefined
     };
 
+    let entry : EntryWithoutId;
     switch (object.type) {
         case 'Hospital':
-            let entry: EntryWithoutId = {
+            entry = {
                 ...isBaseEntry,
                 type: EntryType.Hospital,
             };
@@ -118,7 +119,7 @@ export const toNewEntry = (object: any): EntryWithoutId => {
             entry = {
                 ...isBaseEntry,
                 type: EntryType.OccupationalHealthcare,
-                employerName: parseStringValue(object.employerName, ' employer name')
+                employerName: parseStringValue(object.employerName, 'employer name')
             };
             return entry;
         case 'HealthCheck':
