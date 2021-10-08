@@ -17,7 +17,7 @@ const isDate = (date: string): boolean => {
 
 const parseDate = (date: unknown): string => {
     if (!date || !isString(date) || !isDate(date)) {
-        throw new Error('Incorrect or missing date of birth: ' + date);
+        throw new Error('Incorrect or missing date: ' + date);
     }
     return date;
 };
@@ -50,25 +50,17 @@ const isCorrectType = (type: unknown): EntryType => {
     return type;
 };
 
-// const parseEntries = (entries: unknown): Entry[] => {
-//     if (!entries || !Array.isArray(entries)) {
-//         throw new Error('Incorrect or missing entries: ' + entries);
-//     }
-//     entries.map((entry) => {
-//         isCorrectType(entry.type);
-//     });
-//     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-//     return entries;
-// };
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const isHealthCheckRating = (param: any): param is HealthCheckRating => {
     return Object.values(HealthCheckRating).includes(param);
 };
 
 const parsehealthCheckRating = (rating: unknown): HealthCheckRating => {
-    if (!rating || !isHealthCheckRating(rating)) {
-        throw new Error('Incorrect or missing health check rating: ' + rating);
+    if (rating===undefined) {
+        throw new Error('Missing health check rating');
+    }
+    if(!isHealthCheckRating(rating)) {
+        throw new Error('Incorrect health check rating: ' + rating); 
     }
     return rating;
 };
@@ -81,6 +73,22 @@ const parseDiagnosisCodes = (codes: unknown): string[] => {
             parseStringValue(code, 'diagnosis code')
         );
         return checked;
+};
+
+const parseDischarge = (date: unknown, criteria: unknown) : { date: string, criteria: string} => {
+    const parsedDischarge = {
+        date: parseStringValue(date, 'date of discharge'),
+        criteria: parseStringValue(criteria, 'criteria of discharge')
+    };
+    return parsedDischarge;
+};
+
+const parseSickLeave = (startDate: unknown, endDate: unknown) : { startDate: string, endDate: string} => {
+    const parsed = {
+        startDate: parseDate(startDate),
+        endDate: parseDate(endDate)
+    };
+    return parsed;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -113,13 +121,15 @@ export const toNewEntry = (object: any): EntryWithoutId => {
             entry = {
                 ...isBaseEntry,
                 type: EntryType.Hospital,
+                discharge: object.discharge? parseDischarge(object.discharge.date, object.discharge.criteria) : undefined
             };
             return entry;
         case 'OccupationalHealthcare':
             entry = {
                 ...isBaseEntry,
                 type: EntryType.OccupationalHealthcare,
-                employerName: parseStringValue(object.employerName, 'employer name')
+                employerName: parseStringValue(object.employerName, 'employer name'),
+                sickLeave: object.sickLeave? parseSickLeave(object.sickLeave.startDate, object.sickLeave.endDate) : undefined
             };
             return entry;
         case 'HealthCheck':

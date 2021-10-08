@@ -6,5 +6,9 @@ Content-Type: application/json
 "date": "2021-10-02",
 "type": "OccupationalHealthcare",
 "specialist": "Doctor Doctor",
-"employerName": "Company"
+"employerName": "Company",
+"sickLeave": {
+    "startDate": "2021-10-02",
+    "endDate": 7
+}
 }
