@@ -1,7 +1,6 @@
 import React from "react";
 import axios from "axios";
 import { Container, Table, Button } from "semantic-ui-react";
-
 import { PatientFormValues } from "../AddPatientModal/AddPatientForm";
 import AddPatientModal from "../AddPatientModal";
 import { Patient } from "../types";
@@ -41,7 +40,7 @@ const PatientListPage = () => {
   };
 
   return (
-    <div className="App">
+    <div className="patient-list">
       <Container textAlign="center">
         <h3>Patient list</h3>
       </Container>

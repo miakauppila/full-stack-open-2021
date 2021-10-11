@@ -1,16 +1,19 @@
 import React from "react";
 import { useParams } from "react-router";
 import axios from "axios";
-import { Container, Icon } from "semantic-ui-react";
-
+import { Container, Icon, Button } from "semantic-ui-react";
 import { Patient } from "../types";
 import { apiBaseUrl } from "../constants";
 import { setPatientFullDataAction, useStateValue } from "../state";
 import Entries from "./Entries";
+import AddEntryForm from "./AddEntryForm";
+import { EntryFormValues } from "./AddEntryForm";
+import { addEntryAction } from "../state";
 
 const PatientByIdPage = () => {
     const [{ patientsFullData }, dispatch] = useStateValue();
     const [error, setError] = React.useState<string | undefined>();
+    const [showForm, setShowForm] = React.useState<boolean>(false);
 
     const { id } = useParams<{ id: string }>();
     const foundPatient: Patient = patientsFullData[id];
@@ -36,6 +39,22 @@ const PatientByIdPage = () => {
         };
         void fetchPatientById(id);
     }, [id]);
+    const submitNewEntry = async (values: EntryFormValues) => {
+        try {
+          const { data: updatedPatient } = await axios.post<Patient>(
+            `${apiBaseUrl}/patients/${id}/entries`,
+            values
+          );
+          console.log('responseData', updatedPatient);
+          dispatch(addEntryAction(updatedPatient.entries, id));
+          setShowForm(false);
+        } catch (e: unknown) {
+          if (e instanceof Error) {
+            console.error(e.message || 'Unknown Error');
+            setError(e.message || 'Unknown error');
+          }
+        }
+      };
 
     const getGenderIcon = (gender: string) => {
         if (gender === 'male') {
@@ -68,7 +87,7 @@ const PatientByIdPage = () => {
         );
     }
     return (
-        <div className="App">
+        <div className="patient-details">
             <Container>
                 <h2>{foundPatient.name}
                     <Icon name={getGenderIcon(foundPatient.gender)} size='large' /></h2>
@@ -79,6 +98,18 @@ const PatientByIdPage = () => {
                     <b>Occupation:</b> {foundPatient.occupation}
                 </div>
                 <Entries patient={foundPatient} />
+                {!showForm &&
+                <Button style={{marginTop:"10px"}} onClick={() => setShowForm(true)}>Add New Entry</Button>
+                }
+                {showForm && 
+                <div className="new-entry-form" style={{marginTop:"20px"}}>
+                    <h3>Add new entry</h3>
+                <AddEntryForm 
+                onSubmit={submitNewEntry}
+                onCancel={() => setShowForm(false)}
+                />
+                 </div>
+                }
             </Container>
         </div>
     );

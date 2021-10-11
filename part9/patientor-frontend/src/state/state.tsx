@@ -4,7 +4,7 @@ import { Diagnosis, Patient } from "../types";
 import { Action } from "./reducer";
 
 export type State = {
-  patients: { [id: string]: Patient };
+  patients: { [id: string]: Patient }; // non-sensitive data ie. no ssn+entries
   patientsFullData: { [id: string]: Patient };
   diagnoses: { [code: string]: Diagnosis };
 };
