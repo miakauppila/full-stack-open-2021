@@ -14,7 +14,7 @@ const PatientByIdPage = () => {
     const [{ patientsFullData }, dispatch] = useStateValue();
     const [error, setError] = React.useState<string | undefined>();
     const [showForm, setShowForm] = React.useState<boolean>(false);
-
+    const [{ diagnoses } ] = useStateValue();
     const { id } = useParams<{ id: string }>();
     const foundPatient: Patient = patientsFullData[id];
     console.log('foundPatient:', foundPatient);
@@ -39,6 +39,7 @@ const PatientByIdPage = () => {
         };
         void fetchPatientById(id);
     }, [id]);
+
     const submitNewEntry = async (values: EntryFormValues) => {
         try {
           const { data: updatedPatient } = await axios.post<Patient>(
@@ -77,7 +78,9 @@ const PatientByIdPage = () => {
             </div>
         );
     }
-    if (!foundPatient) {
+    
+    // if either of the fetched data is not ready
+    if (!foundPatient || (Object.keys(diagnoses).length === 0 && diagnoses.constructor === Object)) {
         return (
             <div className="App">
                 <Container>
