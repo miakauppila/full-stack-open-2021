@@ -1,29 +1,10 @@
 import React from "react";
 import { Entry, Patient } from "../types";
-import { useStateValue } from "../state";
+import EntryDetails from "./EntryDetails";
 
 interface EntriesProps {
     patient: Patient
 }
-
-interface EntryDetailsProps {
-    entry: Entry
-}
-
-const EntryDetails = ({ entry }: EntryDetailsProps) => {
-    const [{ diagnoses },] = useStateValue();
-
-    return (
-        <div className="entry-details" style={{marginBottom:"10px"}}>
-            {entry.date} {entry.description}
-            {entry.diagnosisCodes ? (
-                entry.diagnosisCodes.map((code: string) =>
-                    <li key={code}>{code} {diagnoses[code].name}</li>)
-            ) : null
-            }
-        </div>
-    );
-};
 
 const Entries = ({ patient }: EntriesProps) => {
 
