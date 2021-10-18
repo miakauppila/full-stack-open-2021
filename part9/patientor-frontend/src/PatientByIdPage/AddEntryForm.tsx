@@ -27,6 +27,12 @@ const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
 
   const [{ diagnoses }] = useStateValue();
 
+  const isValidDate = (dateString: string) => {
+    const regEx = /^\d{4}-\d{2}-\d{2}$/;
+    // return true when array not null ie. dateString matches regEx
+    return regEx.exec(dateString) != null;
+  };
+
   return (
     <Formik
       initialValues={{
@@ -45,19 +51,25 @@ const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
         if (!values.description) {
           errors.description = requiredError;
         }
+        else if (values.description.length < 20) {
+          errors.description = 'Description min. length is 20';
+        }
         if (!values.date) {
           errors.date = requiredError;
+        }
+        else if (!isValidDate(values.date)) {
+          errors.date = 'Date must be formatted YYYY-MM-DD';
         }
         if (!values.specialist) {
           errors.specialist = requiredError;
         }
-        if (!values.diagnosisCodes) {
-          errors.diagnosisCodes = requiredError;
+        else if (values.specialist.length < 5) {
+          errors.specialist = 'Specialist min. length is 5';
         }
         return errors;
       }}
     >
-
+      {/* isValid returns true if errors is empty */}
       {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
 
         return (
@@ -85,7 +97,7 @@ const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
               setFieldTouched={setFieldTouched}
               diagnoses={Object.values(diagnoses)}
             />
-             <SelectField
+            <SelectField
               label="Type of visit"
               name="type"
               options={entryTypeOptions}
