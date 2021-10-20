@@ -14,7 +14,7 @@ export type EntryFormValues = Omit<Entry, "id">;
 
 const entryTypeOptions: EntryTypeOption[] = [
   { value: EntryType.HealthCheck, label: "Health check" },
-  // { value: EntryType.Hospital, label: "Hospital" },
+  { value: EntryType.Hospital, label: "Hospital" },
   // { value: EntryType.OccupationalHealthcare, label: "Occupational healthcare" },
 ];
 
@@ -41,7 +41,9 @@ const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
         specialist: "",
         diagnosisCodes: [],
         type: EntryType.HealthCheck,
-        healthCheckRating: 0
+        healthCheckRating: 0,
+        dischargeDate: "",
+        dischargeCriteria: ""
       }}
       onSubmit={onSubmit}
       validate={values => {
@@ -66,11 +68,22 @@ const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
         else if (values.specialist.length < 5) {
           errors.specialist = 'Specialist min. length is 5';
         }
+        if (values.dischargeDate) {
+          if (!isValidDate(values.dischargeDate)) {
+            errors.dischargeDate = 'Date must be formatted YYYY-MM-DD';
+          }
+        }
+        if (values.dischargeCriteria) {
+          if (values.dischargeCriteria.length < 10) {
+            errors.dischargeCriteria = 'Criteria min. length is 10';
+          }
+        }
         return errors;
       }}
     >
       {/* isValid returns true if errors is empty */}
-      {({ isValid, dirty, setFieldValue, setFieldTouched }) => {
+      {/* dirty returns false if fields have not been changed */}
+      {({ isValid, dirty, setFieldValue, setFieldTouched, values }) => {
 
         return (
           <Form className="form ui">
@@ -102,13 +115,34 @@ const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
               name="type"
               options={entryTypeOptions}
             />
-            <Field
-              label="Health check rating"
-              name="healthCheckRating"
-              component={NumberField}
-              min={0}
-              max={3}
-            />
+            {/* show below field for Heathcheck */}
+            {values.type === EntryType.HealthCheck ?
+              <Field
+                label="Health check rating"
+                name="healthCheckRating"
+                component={NumberField}
+                min={0}
+                max={3}
+              />
+              : null}
+            {/* show below fields for Hospital */}
+            {values.type === EntryType.Hospital ? (
+              <div>
+                <Field
+                  label="Discharge date"
+                  placeholder="YYYY-MM-DD"
+                  name="dischargeDate"
+                  component={TextField}
+                />
+                <Field
+                  label="Discharge criteria"
+                  placeholder="Criteria"
+                  name="dischargeCriteria"
+                  component={TextField}
+                />
+              </div>
+            )
+              : null}
 
             <Grid>
               <Grid.Column floated="left" width={5}>
