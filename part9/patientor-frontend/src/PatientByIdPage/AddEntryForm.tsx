@@ -82,11 +82,20 @@ const AddEntryForm = ({ onSubmit, onCancel }: Props) => {
             errors.discharge = {};
             errors.discharge.date = 'Date must be formatted YYYY-MM-DD';
           }
+          if (!values.discharge.criteria) {
+            errors.discharge = {};
+            errors.discharge.criteria = 'In case of discharge, both date and criteria are required';
+          }
         }
         if (values.discharge.criteria) {
           if (values.discharge.criteria.length < 10) {
             errors.discharge = {};
             errors.discharge.criteria = 'Criteria min. length is 10';
+          }
+          if (!values.discharge.date) {
+            errors.discharge = {};
+            errors.discharge.date = 'In case of discharge, both date and criteria are required';
+
           }
         }
         if (values.type === EntryType.OccupationalHealthcare) {
