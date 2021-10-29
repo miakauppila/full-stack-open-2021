@@ -77,7 +77,7 @@ const parseDiagnosisCodes = (codes: unknown): string[] => {
 
 const parseDischarge = (date: unknown, criteria: unknown) : { date: string, criteria: string} => {
     const parsedDischarge = {
-        date: parseStringValue(date, 'date of discharge'),
+        date: parseDate(date),
         criteria: parseStringValue(criteria, 'criteria of discharge')
     };
     return parsedDischarge;
@@ -121,7 +121,7 @@ export const toNewEntry = (object: any): EntryWithoutId => {
             entry = {
                 ...isBaseEntry,
                 type: EntryType.Hospital,
-                discharge: object.discharge? parseDischarge(object.discharge.date, object.discharge.criteria) : undefined
+                discharge: object.discharge.date || object.discharge.criteria? parseDischarge(object.discharge.date, object.discharge.criteria) : undefined
             };
             return entry;
         case 'OccupationalHealthcare':
@@ -129,7 +129,7 @@ export const toNewEntry = (object: any): EntryWithoutId => {
                 ...isBaseEntry,
                 type: EntryType.OccupationalHealthcare,
                 employerName: parseStringValue(object.employerName, 'employer name'),
-                sickLeave: object.sickLeave? parseSickLeave(object.sickLeave.startDate, object.sickLeave.endDate) : undefined
+                sickLeave: object.sickLeave.startDate || object.sickLeave.endDate? parseSickLeave(object.sickLeave.startDate, object.sickLeave.endDate) : undefined
             };
             return entry;
         case 'HealthCheck':
