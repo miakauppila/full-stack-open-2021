@@ -43,9 +43,20 @@ const addEntry = (entryObj: EntryWithoutId, patientId: string): Patient => {
   if(!foundPatient) {
     throw new Error('Patient with given Id not found');
   }
-  foundPatient?.entries.push(newEntry);
+  foundPatient.entries.push(newEntry);
   console.log('entryService ready', foundPatient);
   return foundPatient;
+};
+
+
+const deleteEntry = (patientId: string, entryId: string): null => {
+  const foundPatient = patients.find(patient => patient.id === patientId);
+  if(!foundPatient) {
+    throw new Error('Patient with given Id not found');
+  }
+  foundPatient.entries = foundPatient.entries.filter((entry) => entry.id !== entryId);
+  console.log('deleteService ready', foundPatient);
+  return null;
 };
 
 export default {
@@ -53,5 +64,6 @@ export default {
   getNonSensitiveEntries,
   getPatientById,
   addPatient,
-  addEntry
+  addEntry,
+  deleteEntry
 };

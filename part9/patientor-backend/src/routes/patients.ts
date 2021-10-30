@@ -44,5 +44,17 @@ router.post('/:id/entries', (req, res) => {
   }
 });
 
+router.delete('/:id/entries/:entryId', (req, res) => {
+  const patientId = req.params.id;
+  const entryId = req.params.entryId;
+  try {
+    patientService.deleteEntry(patientId, entryId);
+    res.status(204).end(); // no content returned for successful req
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
+    res.status(400).send(e.message);
+  }
+});
+
 
 export default router;
