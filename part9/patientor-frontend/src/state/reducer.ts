@@ -21,8 +21,15 @@ export type Action =
   | {
     type: "ADD_ENTRY";
     payload: {
-      patientEntries: Entry[], 
+      patientEntries: Entry[],
       id: string
+    };
+  }
+  | {
+    type: "DELETE_ENTRY";
+    payload: {
+      patientId: string,
+      entryId: string
     };
   };
 
@@ -70,20 +77,30 @@ export const reducer = (state: State, action: Action): State => {
       const id = action.payload.id;
       const patient = state.patientsFullData[id];
       patient.entries = action.payload.patientEntries;
-      console.log('new Arr', patient.entries);
       return {
         ...state,
         patientsFullData: {
           ...state.patientsFullData,
-          [id]: patient 
+          [id]: patient
+        }
+      };
+    case "DELETE_ENTRY":
+      const patientId = action.payload.patientId;
+      const entryId = action.payload.entryId;
+      const foundPatient = state.patientsFullData[patientId];
+      foundPatient.entries = foundPatient.entries.filter((entry) => entry.id !== entryId);
+      console.log('new Arr', foundPatient.entries);
+      return {
+        ...state,
+        patientsFullData: {
+          ...state.patientsFullData,
+          [patientId]: foundPatient
         }
       };
     default:
       return state;
   }
 };
-
-
 
 export const setPatientListAction = (patientListFromApi: Patient[]): Action => {
   return {
@@ -114,12 +131,21 @@ export const setDiagnosesAction = (diagnosesListFromApi: Diagnosis[]): Action =>
 };
 
 export const addEntryAction = (patientEntries: Entry[], id: string): Action => {
-  console.log('addEntryAction');
   return {
     type: "ADD_ENTRY",
     payload: {
-      patientEntries, 
+      patientEntries,
       id
+    }
+  };
+};
+
+export const deleteEntryAction = (patientId: string, entryId: string): Action => {
+  return {
+    type: "DELETE_ENTRY",
+    payload: {
+      patientId,
+      entryId
     }
   };
 };
