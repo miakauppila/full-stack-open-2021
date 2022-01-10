@@ -5,7 +5,8 @@ import NewBook from './components/NewBook'
 import LoginForm from './components/LoginForm'
 import Notify from './components/Notify'
 import Recomended from './components/Recomended'
-import { useApolloClient } from '@apollo/client'
+import { useApolloClient, useSubscription } from '@apollo/client'
+import { ALL_BOOKS, BOOK_ADDED } from './queries'
 
 const App = () => {
   const [page, setPage] = useState('authors')
@@ -14,18 +15,43 @@ const App = () => {
 
   const client = useApolloClient()
 
-  const handleLogout = () => {
-    setToken(null)
-    localStorage.clear()
-    client.resetStore() // clear Apollo cache
-    setPage('authors')
-  }
-
   const notify = (message) => {
     setErrorMessage(message)
     setTimeout(() => {
       setErrorMessage(null)
     }, 10000)
+  }
+
+  // client subscribes to bookAdded and calls the fn
+  // dataInStrore updated when subscription (addedBook) was initiated by another client
+  // when this client creates newBook this same fn is called
+  const updateCacheWith = (addedBook) => {
+    const includedIn = (set, object) => 
+      set.map(p => p.id).includes(object.id)  
+
+    const dataInStore = client.readQuery({ query: ALL_BOOKS })
+    if (!includedIn(dataInStore.allBooks, addedBook)) {
+      client.writeQuery({
+        query: ALL_BOOKS,
+        data: { allBooks : dataInStore.allBooks.concat(addedBook) }
+      })
+    }   
+  }
+
+  useSubscription(BOOK_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      const addedBook = subscriptionData.data.bookAdded
+      console.log(addedBook)
+      window.alert(`Books list updated with new book: ${addedBook.title}`)
+      updateCacheWith(addedBook)
+    }
+  })
+
+  const handleLogout = () => {
+    setToken(null)
+    localStorage.clear()
+    client.resetStore() // clear Apollo cache
+    setPage('authors')
   }
 
   // retrieve token on page refresh
@@ -60,6 +86,7 @@ const App = () => {
         show={page === 'add'}
         setError={notify}
         setPage={setPage}
+        updateCacheWith={updateCacheWith}
       />
 
       <Recomended
