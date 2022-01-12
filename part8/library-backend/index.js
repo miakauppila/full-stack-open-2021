@@ -21,7 +21,7 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true,
     console.log('error connection to MongoDB:', error.message)
   })
 
-  // Graph QL schema
+// Graph QL schema
 const typeDefs = gql`
   type Author {
     name: String!
@@ -106,11 +106,9 @@ const resolvers = {
     }
   },
   Author: {
-    bookCount: async (root) => {
-      // await is necessary for the filtering
-      const books = await Book.find({}).populate('author')
-      const booksFromAuthor = books.filter(book => book.author.name === root.name)
-      return booksFromAuthor.length
+    bookCount: (root) => {
+      // return 0 in case Author was created without books field
+      return root.books?.length
     }
   },
   Mutation: {
@@ -119,36 +117,27 @@ const resolvers = {
       if (!currentUser) {
         throw new AuthenticationError("not authenticated")
       }
-      const existingAuthor = await Author.findOne({ name: args.author })
+      // title is set as unique in bookSchema
+
+      let existingAuthor = await Author.findOne({ name: args.author })
       if (!existingAuthor) {
-        const newAuthor = new Author({ name: args.author, born: null })
-        const newBook = new Book({ ...args, author: newAuthor })
-        console.log(newBook)
-        try {
-          await newBook.save()
-          await newAuthor.save()
-        }
-        catch (error) {
-          throw new UserInputError(error.message, {
-            invalidArgs: args,
-          })
-        }
-        pubsub.publish('BOOK_ADDED', { bookAdded: newBook })
-        return newBook
+        existingAuthor = new Author({ name: args.author, born: null })
       }
-      else {
-        const newBook = new Book({ ...args, author: existingAuthor })
-        try {
-          await newBook.save()
-        }
-        catch (error) {
-          throw new UserInputError(error.message, {
-            invalidArgs: args,
-          })
-        }
-        pubsub.publish('BOOK_ADDED', { bookAdded: newBook })
-        return newBook
+      const newBook = new Book({ ...args, author: existingAuthor })
+      console.log(newBook)
+      try {
+        await newBook.save()
+        // add the id of the book to author's books array
+        existingAuthor.books = existingAuthor.books.concat(newBook._id)
+        await existingAuthor.save()
       }
+      catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args,
+        })
+      }
+      pubsub.publish('BOOK_ADDED', { bookAdded: newBook })
+      return newBook
     },
     editAuthor: async (root, args, context) => {
       const currentUser = context.currentUser
