@@ -15,6 +15,10 @@ const Books = (props) => {
     return <div>loading...</div>
   }
 
+  if(result.error) {
+    return <div>Sorry, an unexpected error occurred.</div>
+  }
+
   let books = result.data.allBooks
   let uniqueGenres = []
 
@@ -57,10 +61,12 @@ const Books = (props) => {
           )}
         </tbody>
       </table>
+      <div style={{marginTop:'30px'}}>
       {uniqueGenres.map(genre => 
       <button key={genre} onClick={() => setFilterGenre(genre)}>{genre}</button>
         )}
       <button onClick={() => setFilterGenre('all genres')}>all genres</button>
+      </div>
     </div>
   )
 }

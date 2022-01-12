@@ -15,8 +15,11 @@ const Recomended = (props) => {
     return <div>loading...</div>
   }
 
+  if(result.error) {
+    return <div>Sorry, an unexpected error occurred.</div>
+  }
+
   const user = result.data.me
-  console.log(user)
   const favoriteGenre = user.favoriteGenre
 
   let books = bookResult.data.allBooks

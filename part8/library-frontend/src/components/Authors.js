@@ -45,6 +45,10 @@ const Authors = ( { show, setError }) => {
     return <div>loading...</div>
   }
 
+  if(result.error) {
+    return <div>Sorry, an unexpected error occurred.</div>
+  }
+
   //authors available only after result.loading false
   const authors = result.data.allAuthors
 
@@ -92,7 +96,7 @@ const Authors = ( { show, setError }) => {
             required
           />
         </div>
-        <button type='submit'>update author</button>
+        <button style={{marginTop:'10px'}} type='submit'>update author</button>
       </form>
 
     </div>
