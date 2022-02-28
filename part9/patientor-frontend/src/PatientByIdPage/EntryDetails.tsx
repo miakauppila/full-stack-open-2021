@@ -28,6 +28,7 @@ const HospitalDetails = ({ hospitalEntry, deleteEntry }: HospitalProps) => {
                         hospitalEntry.diagnosisCodes.map((code: string) =>
                             <li key={code}>{code} {diagnoses[code].name}</li>)
                     }
+                     <p style={{ marginTop: "5px" }}>Diagnose by: {hospitalEntry.specialist}</p>
                     <div style={{ position: "relative", bottom: "30px", float: "right", marginBottom: "-40px" }}>
                         <ConfirmModal onConfirm={deleteEntry} />
                     </div>
@@ -59,6 +60,7 @@ const OccupationalDetails = ({ occupEntry, deleteEntry }: OccupationalProps) => 
                         occupEntry.diagnosisCodes.map((code: string) =>
                             <li key={code}>{code} {diagnoses[code].name}</li>)
                     }
+                    <p style={{ marginTop: "5px" }}>Diagnose by: {occupEntry.specialist}</p>
                     <div style={{ position: "relative", bottom: "30px", float: "right", marginBottom: "-40px" }}>
                         <ConfirmModal onConfirm={deleteEntry} />
                     </div>
@@ -104,6 +106,7 @@ const HealthCheckDetails = ({ healthEntry, deleteEntry }: HealthCheckProps) => {
                         healthEntry.diagnosisCodes.map((code: string) =>
                             <li key={code}>{code} {diagnoses[code].name}</li>)
                     }
+                    <p style={{ marginTop: "5px" }}>Diagnose by: {healthEntry.specialist}</p>
                     <div style={{ position: "relative", bottom: "30px", float: "right", marginBottom: "-40px" }}>
                         <ConfirmModal onConfirm={deleteEntry} />
                     </div>
